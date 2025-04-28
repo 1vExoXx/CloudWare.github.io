@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buy CloudWare Key</title>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1 class="logo">CloudWare</h1>
+            <nav class="nav">
+                <a href="index.html">Home</a>
+                <a href="features.html">Features</a>
+                <a href="pricing.html">Pricing</a>
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="content">
+        <div class="container">
+            <h2>Purchase a CloudWare License Key</h2>
+            <p>Please send <strong>€20</strong> to our PayPal using <strong>Friends & Family</strong> option:</p>
+            <p><strong>PayPal:</strong> <a href="https://paypal.me/Kernelsys" target="_blank">paypal.me/Kernelsys</a></p>
+
+            <p>After sending, enter your PayPal email below and we'll send you your CloudWare Key!</p>
+
+            <form id="payment-form">
+                <input type="email" id="paypal-email" name="paypal-email" placeholder="Your PayPal Email" required>
+                
+                <!-- reCAPTCHA Widget -->
+                <div class="g-recaptcha" data-sitekey="6LcdrycrAAAAAKYUhjWDpsbok6qM7MFUNmQjTu4t"></div>
+
+                <button type="submit" id="submit-button">Confirm Payment</button>
+            </form>
+
+            <div id="message"></div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p>© 2025 CloudWare. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('payment-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            var paypalEmail = document.getElementById('paypal-email').value;
+            var submitButton = document.getElementById('submit-button');
+            var messageElement = document.getElementById('message');
+            var recaptchaResponse = grecaptcha.getResponse();
+
+            // Check if reCAPTCHA is completed
+            if (recaptchaResponse.length === 0) {
+                messageElement.innerHTML = "<p>Please complete the reCAPTCHA verification before submitting.</p>";
+                return;
+            }
+
+            // Disable the submit button to prevent further submissions
+            submitButton.disabled = true;
+            submitButton.innerHTML = "Processing...";
+
+            // Prepare the message payload for Discord
+            var messageData = {
+                content: "New CloudWare Purchase Request!",
+                embeds: [{
+                    title: 'New Request',
+                    fields: [
+                        {
+                            name: 'PayPal Email',
+                            value: paypalEmail,
+                            inline: true
+                        }
+                    ]
+                }]
+            };
+
+            // Send the data to Discord Webhook
+            fetch("https://discord.com/api/webhooks/1366512896280105061/GQhiTI807d5fO96y9zwlhVXPJqY7qCDy6UfKJr-2FuPZk6lYuF42hBII2KF8OG76zY4H", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(messageData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data) {
+                    messageElement.innerHTML = "<p>Thank you! We have received your request. We will verify your payment and send the key soon.</p>";
+                } else {
+                    messageElement.innerHTML = "<p>Something went wrong. Please try again later.</p>";
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                messageElement.innerHTML = "<p>Sorry, something went wrong. Please try again later.</p>";
+            })
+            .finally(() => {
+                // Re-enable the submit button after a short timeout
+                setTimeout(function() {
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = "Confirm Payment";
+                }, 5000); // 5 seconds timeout to prevent rapid resubmissions
+            });
+        });
+    </script>
+</body>
+</html>
